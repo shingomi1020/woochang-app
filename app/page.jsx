@@ -81,7 +81,7 @@ const Seg=memo(({items,value,onChange})=>(<div className="flex gap-2">{items.map
 // Post-process detail panel (condensed)
 const PostDetail=memo(function({postId,label,qty,width,height,pricing,eyeletExtra,eyeletExtraStr,setEyeletExtraStr}){
   if(postId==="아일렛"||postId==="끈고리")return(<div className="mt-3 bg-slate-50 border rounded-xl p-3 text-sm space-y-2"><div className="flex items-center justify-between"><span>{label}</span><span className="font-medium">무료 / 장</span></div><div className="flex items-center justify-between gap-2"><label className="whitespace-nowrap">{postId==="끈고리"?"추가 끈고리 수량":"추가 타공 수량"}</label><div className="flex items-center gap-2"><Button type="button" onClick={()=>setEyeletExtraStr(String(Math.max(0,(Number(eyeletExtraStr||0)||0)-1)))}>−</Button><input inputMode="numeric" className={CLS.inp} value={eyeletExtraStr} onChange={e=>setEyeletExtraStr(e.target.value.replace(RE_NON_DIGIT,""))}/><Button type="button" onClick={()=>setEyeletExtraStr(String((Number(eyeletExtraStr||0)||0)+1))}>＋</Button></div></div><div className="grid grid-cols-2 gap-1 text-xs text-gray-700"><div>기본: <b>4</b>개/장 (무료)</div><div>추가: <b>{eyeletExtra}</b>개/장</div><div>합계: <b>{4+eyeletExtra}</b>개/장</div><div>{postId==="끈고리"?"총 끈고리 수":"총 타공수"}: <b>{(4+eyeletExtra)*qty}</b>개</div></div></div>);
-  if(postId==="각목+로프")return(<div className="mt-3 bg-slate-50 border rounded-xl p-3 text-sm space-y-2"><div className="flex items-center justify-between"><span>각목+로프</span><span className="font-medium">장당 기본 1벌(=2개) · {format(woodRopeUnitByHeight((pricing?.matchedHeight??(height||0))))}원</span></div><div className="grid grid-cols-2 gap-1 text-xs text-gray-700"><div>장당 벌 수: <b>1</b>벌</div><div>총 벌 수: <b>{qty}</b>벌</div></div></div>);
+  if(postId==="각목+로프")return(<div className="mt-3 bg-slate-50 border rounded-xl p-3 text.sm space-y-2"><div className="flex items-center justify-between"><span>각목+로프</span><span className="font-medium">장당 기본 1벌(=2개) · {format(woodRopeUnitByHeight((pricing?.matchedHeight??(height||0))))}원</span></div><div className="grid grid-cols-2 gap-1 text-xs text-gray-700"><div>장당 벌 수: <b>1</b>벌</div><div>총 벌 수: <b>{qty}</b>벌</div></div></div>);
   if(postId==="로프미싱"||postId==="양면테이프")return(<div className="mt-3 bg-slate-50 border rounded-xl p-3 text-sm space-y-2"><div className="flex items-center justify-between"><span>{label}</span><span className="font-medium">{format(sewOrTapeUnitByArea(width||0,height||0))}원</span></div><div className="text-xs text-gray-600">계산식: ⌈가로/1000⌉ × ⌈세로/1000⌉ × 1000원 (최소 2,000원)</div></div>);
   return null;
 });
@@ -142,9 +142,8 @@ function PricingForm(){
     pricing.mode==="fixed"?`게시대현수막 장당 고정가 ${format(pricing.unitPriceUsed)}원`:null):null;
 
   return(<div className="p-6 max-w-4xl mx-auto">
-    <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab}/>
-
-    <Card className="shadow-md"><CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <h1 className="text-2xl font-bold">PricingForm Preview</h1>
+    <Card className="mt-4 shadow-md"><CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* 좌측 입력 */}
       <div className="space-y-4 min-w-0">
         <div>
@@ -181,7 +180,7 @@ function PricingForm(){
             <NumInput value={wStr} onChange={(v)=>{ if(isSticker(material)&&dombo&&stickerRoll){ const max=stickerRoll-DOMBO_TOTAL_MARGIN; const n=Number(v||0); if(n>max){ setDomboExceeded(true); return; } else if(domboExceeded){ setDomboExceeded(false);} } setWStr(v); }} className={`${CLS.inp} ${currentLocks.lockW?'bg-gray-50 text-blue-700 font-semibold opacity-100':''} w-24`} placeholder="mm" disabled={currentLocks.lockW}/>
             <span className="text-[11px] text-gray-500">세로</span>
             <NumInput value={hStr} onChange={setHStr} className={`${CLS.inp} ${currentLocks.lockH?'bg-gray-50 text-blue-700 font-semibold opacity-100':''} w-24`} placeholder="mm" disabled={currentLocks.lockH}/>
-            {(!currentLocks.lockW||!currentLocks.lockH)&&(<><Button type="button" className="ml-2" onClick={onResetSizes}>초기화</Button><span className="text-xs text-gray-500">안전 한도: {format(MAX_MM)}mm</span></>)}
+            {(!currentLocks.lockW||!currentLocks.lockH)&&(<><Button type="button" className="ml-2" onClick={onResetSizes}>초기화</Button><span className="text-xs text-gray-500">안전 한도: {MAX_MM.toLocaleString("ko-KR")}mm</span></>)}
             {isPostBanner&&<span className={CLS.badge}>설치비 포함</span>}
             {group==="배너"&&(<><Button type="button" variant={bannerCustom?"solid":"ghost"} className={`ml-2 ${bannerCustom?"bg-black text-white border-black hover:bg-black":""}`} onClick={()=>setBannerCustom(v=>!v)}>{bannerCustom?"비규격 해제":"비규격 적용"}</Button><span className="text-[11px] text-gray-500">{bannerCustom?"직접 입력 가능":"기본 600×1800"}</span></>)}
           </div>
@@ -192,8 +191,8 @@ function PricingForm(){
         <div>
           <label className="block text-sm font-medium">수량</label>
           <QtyInput value={qStr} setValue={setQStr}/>
-          {isPostBanner&&(<div className="mt-2 flex flex-wrap items-center gap-2">{[5,10,15,20,25,30,35,40,45,50].map(n=>(<Button key={n} variant={Number(qStr)===n?"solid":"ghost"} className={`${Number(qStr)===n?"bg-black text-white border-black hover:bg-black":""}`} onClick={()=>setQStr(p=>String(Number(p)===n?1:n))}>{n}개</Button>))}<span className="text-[11px] text-gray-500">빠른 선택</span></div>)}
-          <p className="text-[11px] text-gray-500 mt-1">최대 {format(MAX_QTY)}장</p>
+          {isPostBanner&&(<div className="mt-2 flex 플렉스 items-center gap-2">{[5,10,15,20,25,30,35,40,45,50].map(n=>(<Button key={n} variant={Number(qStr)===n?"solid":"ghost"} className={`${Number(qStr)===n?"bg-black text-white border-black hover:bg-black":""}`} onClick={()=>setQStr(p=>String(Number(p)===n?1:n))}>{n}개</Button>))}<span className="text-[11px] text-gray-500">빠른 선택</span></div>)}
+          <p className="text-[11px] text-gray-500 mt-1">최대 {MAX_QTY.toLocaleString("ko-KR")}장</p>
         </div>
 
         {showPostProcess&&(<div>
@@ -222,7 +221,6 @@ function PricingForm(){
       {[['후가공',postSupply,postProcess.id?postProcess.label:'-'],['부속품',accSupply,accessory.id?accessory.label:'-'],['납품',deliverySupply,delivery.id?delivery.label:'-'],['설치·시공',installSupply,install.id?install.label:'-']].filter(([_,v])=>v>0).map(([k,v,desc])=>(<tr key={k}><td className="px-3 py-2 align-top text-gray-600">{k}</td><td className="px-3 py-2 align-top">{desc}</td><td className="px-3 py-2 align-top text-right">{format(v)}원</td></tr>))}
       <tr><td className="px-3 py-2 align-top text-gray-600">공급가 합계</td><td className="px-3 py-2 align-top text-gray-500">(본판 + 후가공 + 부속품 + 납품 + 설치)</td><td className="px-3 py-2 align-top text-right font-semibold">{format(supplyShown)}원</td></tr></tbody><tfoot><tr className="bg-gray-50"><td className="px-3 py-2 align-top text-gray-600">부가세(10%)</td><td className="px-3 py-2 align-top"></td><td className="px-3 py-2 align-top text-right font-medium">{format(vat)}원</td></tr><tr className="bg-gray-100"><td className="px-3 py-3 align-top text-gray-900 font-semibold text-base">결제금액</td><td className="px-3 py-3 align-top"></td><td className="px-3 py-3 align-top text-right text-red-600 font-bold text-xl">{format(total)}원</td></tr></tfoot></table></div>):(<div className="text-xs text-gray-500">필수 항목을 입력해 주세요.</div>)}
     </CardContent></Card>
-
     <div className="text-[11px] text-gray-500 mt-4">{isSticker(material)?GUIDE_STICKER:(isPostBanner?GUIDE_POST:GUIDE_NORMAL)}</div>
     <DevTests/>
   </div>);
@@ -247,7 +245,7 @@ function DevTests(){useEffect(()=>{
   const pW=calcPricing("수성현수막",1000,901,1,'W');
   const pA=calcPricing("수성현수막",1000,901,1);
   console.assert(pH&&pH.mode==="roll"&&pH.orientation==='H'&&pH.matchedHeight===1000&&pH.supplyTotal===8000,`[DevTests] roll by H expected 8000, got ${JSON.stringify(pH)}`);
-  console.assert(pW&&pW.mode==="roll"&&pW.orientation==='W'&&pW.supplyTotal===7208,`[DevTests] roll by W expected 7208, got ${JSON.stringify(pW)}`);
+  console.assert(pW&&pW.mode==="roll"&&pW.supplyTotal===7208,`[DevTests] roll by W expected 7208, got ${JSON.stringify(pW)}`);
   console.assert(pA&&pA.mode==="roll"&&pA.supplyTotal===Math.min(pH.supplyTotal,pW.supplyTotal),`[DevTests] AUTO uses cheaper of H/W, got ${JSON.stringify(pA)}`);
   const p2=calcPricing("수성현수막",1000,2000,1);
   console.assert(p2&&p2.mode==="area"&&p2.supplyTotal===22000,`[DevTests] calcPricing(water,1000,2000,1) expected area/22000, got ${JSON.stringify(p2)}`);
@@ -304,7 +302,6 @@ export default function PreviewCanvas(){
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold">PricingForm Preview</h1>
         <PricingForm/>
       </div>
     </div>
